@@ -36,8 +36,19 @@ def format_phone(phone):
         return f'{print_phone(phone)} доб. {additional}'
     elif len(phone) == 10:
         return print_phone(phone)
-    
+
+def merge_fio(contact_list, contact, n):
+    list_len = len(contact)
+    for i in range(3, list_len):
+        if contact[i]: contact_list[n][i] = contact[i]
+
+def delete_contact(contacts_list, n):
+    del contacts_list[n]
+
+
 fio_list = []
+contacts_to_delete = []
+
 for contact in contacts_list:
     if not contact[1]:
         format_all_in_last_name(contact)
@@ -47,12 +58,25 @@ for contact in contacts_list:
         contact[5] = format_phone(contact[5])
     fio = ' '.join(contact[:3])
     fi = ' '.join(contact[:2])
-    # print(fio + '|')
+    # print(fio + '|' )
     # print(fi + '|')
     # print(fio_list)
-    if fi in fio_list:
-        print('match ' + fio)
-    else:
-        fio_list.append(fio)
+    for n, fio2 in enumerate(fio_list):
+        if fi in fio2:
+            # print(f'match {fio} with {fio2} n = {n}')
+            merge_fio(contacts_list, contact, n)
+            contacts_to_delete.append(len(fio_list))
+            fio_list.append('')
+            break
+    else: fio_list.append(fio)
 
-# pprint(contacts_list)
+for n in sorted(contacts_to_delete, reverse=True):
+    # print(n)
+    delete_contact(contacts_list, n)
+
+# pprint(fio_list)
+pprint(contacts_list)
+
+with open("phonebook.csv", "w", encoding="utf-8") as f:
+  datawriter = csv.writer(f, delimiter=',')
+  datawriter.writerows(contacts_list)
