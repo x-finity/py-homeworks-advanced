@@ -5,7 +5,6 @@ from pprint import pprint
 with open('phonebook_raw.csv', 'r', encoding='utf-8') as f:
     rows = csv.reader(f, delimiter=",")
     contacts_list = list(rows)
-    # pprint(contacts_list)
 
 
 def format_all_in_last_name(contact):
@@ -40,7 +39,7 @@ def format_phone(phone):
 def merge_fio(contact_list, contact, n):
     list_len = len(contact)
     for i in range(3, list_len):
-        if contact[i]: contact_list[n][i] = contact[i]
+        if contact[i]: contact_list[n][i] = contact[i] # по какому правилу мерджить, если и там и там будут данные?
 
 def delete_contact(contacts_list, n):
     del contacts_list[n]
@@ -58,9 +57,6 @@ for contact in contacts_list:
         contact[5] = format_phone(contact[5])
     fio = ' '.join(contact[:3])
     fi = ' '.join(contact[:2])
-    # print(fio + '|' )
-    # print(fi + '|')
-    # print(fio_list)
     for n, fio2 in enumerate(fio_list):
         if fi in fio2:
             # print(f'match {fio} with {fio2} n = {n}')
@@ -75,7 +71,7 @@ for n in sorted(contacts_to_delete, reverse=True):
     delete_contact(contacts_list, n)
 
 # pprint(fio_list)
-pprint(contacts_list)
+# pprint(contacts_list)
 
 with open("phonebook.csv", "w", encoding="utf-8") as f:
   datawriter = csv.writer(f, delimiter=',')
