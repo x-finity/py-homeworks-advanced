@@ -1,7 +1,6 @@
-import time
 from pprint import pprint
 import json
-import re
+# import re
 import bs4
 import requests
 from fake_headers import Headers
@@ -40,19 +39,21 @@ def parse_page(job_tags, max_vacancy=None, dollar_sal=False):
             company = company_tag.find("a", attrs = {"data-qa" : "vacancy-serp__vacancy-employer"}).text
             company_address = company_tag.find("div", attrs = {"data-qa" : "vacancy-serp__vacancy-address"}).text
             salary_tag = job_tag.find("span", attrs = {"data-qa" : "vacancy-serp__vacancy-compensation"})
-            pattern = re.compile(r"<span[^>]*>(.*)</span>")
-            pattern2 = re.compile(r"<!-- -->")
+            # pattern = re.compile(r"<span[^>]*>(.*)</span>")
+            # pattern2 = re.compile(r"<!-- -->")
             # pattern = re.compile(r"<span[^>]*>(.*)\s(<!-- -->)?(.*)</span>")
             
             if not salary_tag:
                 salary = "зарплата не указана"
             else:
-                salary = str(salary_tag)
-                salary = re.sub(pattern, r"\1", salary)
-                salary = re.sub(pattern2, "", salary)
+                salary = salary_tag.text
+                # salary = str(salary_tag)
+                # salary = re.sub(pattern, r"\1", salary)
+                # salary = re.sub(pattern2, "", salary)
 
             if dollar_sal:
-                if re.findall(r"\$", salary):
+                # if re.findall(r"\$", salary):
+                if '$' in salary:
                     append_data(parsed_data, relative_url, title, company, company_address, salary)
             else:
                 append_data(parsed_data, relative_url, title, company, company_address, salary)
@@ -84,6 +85,6 @@ def get_all_jobs(pages=1, max_vacancy=None, dollar_sal=False):
 
 #pprint(get_all_jobs(page=3, max_vacancy=10))
 # pprint(parse_page(job_tags, max_vacancy=10))
-jobs = get_all_jobs(pages=5)
+jobs = get_all_jobs(pages=3, max_vacancy=5)
 # jobs = get_all_jobs(pages=5, dollar_sal=True)
 json.dump(jobs, open("data.json", "w", encoding="utf-8"), indent=4, ensure_ascii=False)
