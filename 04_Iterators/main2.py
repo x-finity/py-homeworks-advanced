@@ -101,10 +101,10 @@ def test_3():
 if __name__ == '__main__':
     test_3()
 
-def flat_generator(list_of_list):
+def flat_generator2(list_of_list):
     for lists in list_of_list:
         if isinstance(lists, list):
-            yield from flat_generator(lists)
+            yield from flat_generator2(lists)
         else:
             yield lists
 
@@ -117,15 +117,15 @@ def test_4():
     ]
 
     for flat_iterator_item, check_item in zip(
-            flat_generator(list_of_lists_2),
+            flat_generator2(list_of_lists_2),
             ['a', 'b', 'c', 'd', 'e', 'f', 'h', False, 1, 2, None, '!']
     ):
 
         assert flat_iterator_item == check_item
 
-    assert list(flat_generator(list_of_lists_2)) == ['a', 'b', 'c', 'd', 'e', 'f', 'h', False, 1, 2, None, '!']
+    assert list(flat_generator2(list_of_lists_2)) == ['a', 'b', 'c', 'd', 'e', 'f', 'h', False, 1, 2, None, '!']
 
-    assert isinstance(flat_generator(list_of_lists_2), types.GeneratorType)
+    assert isinstance(flat_generator2(list_of_lists_2), types.GeneratorType)
 
 
 if __name__ == '__main__':
