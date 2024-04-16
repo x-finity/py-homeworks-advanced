@@ -3,11 +3,11 @@ import sys
 from pathlib import Path
 
 path = Path(__file__).parent.parent.resolve()
-# print(path)
+print(path)
 sys.path.append(str(path))
 
 from main import solution, vote, turtle_hare
-from yandex import create_folder, create_headers, delete_folder
+from yandex import create_folder, create_headers, delete_folder, get_folder_info
 
 
 @pytest.mark.parametrize(
@@ -16,8 +16,8 @@ from yandex import create_folder, create_headers, delete_folder
             (1, 8, 15, (-3.0, -5.0)),
             (-4, 28, -49, (3.5,)),
             (1, 1, 1, "корней нет"),
-            (0, 0, 0, ValueError),  # Проверка отработки raise в случае нулевого коэффициента
-            (1, 0, 0, (4.0,))  # Проверка отработки неверного expected
+            (0, 0, 0, ValueError)  # Проверка отработки raise в случае нулевого коэффициента
+            #  (1, 0, 0, (4.0,)) Проверка отработки неверного expected
     )
 )
 def test_solution(a, b, c, expected):
@@ -34,8 +34,8 @@ def test_solution(a, b, c, expected):
             ([1, 1, 1, 2, 3], 1),
             ([1, 2, 3, 2, 2], 2),
             (2, ValueError),  # Проверка отработки raise в случае неверного типа данных
-            ([], ValueError),  # Проверка отработки raise в случае пустого списка
-            ([2, 3, 3, 2, 2], 1)  # Проверка отработки неверного expected
+            ([], ValueError)  # Проверка отработки raise в случае пустого списка
+            #  ([2, 3, 3, 2, 2], 1) Проверка отработки неверного expected
     ))
 def test_vote(votes, expected):
     if isinstance(expected, type) and issubclass(expected, ValueError):
@@ -61,13 +61,33 @@ class TestYandexDisk:
 
     def setup_method(self):
         self.url = "https://cloud-api.yandex.net/v1/disk/resources"
-        self.headers = create_headers()
+        self.config_file = f"{path}/config.json"
+        # print(self.config_file)
+        self.headers = create_headers(self.config_file)
+        # print(self.headers)
         self.folder_name = "test_folder"
 
     def teardown_method(self):
-        delete_folder(self.folder_name)
+        delete_folder(self.folder_name, self.url, self.headers)
 
     def test_create_folder_code_201(self):
-        response = create_folder(self.folder_name)
+        response = create_folder(self.folder_name, self.url, self.headers)
         assert response.status_code == 201
-    
+
+    def test_create_folder_code_409(self):
+        if get_folder_info(self.folder_name, self.url, self.headers).status_code != 200:
+            create_folder(self.folder_name, self.url, self.headers)
+        assert create_folder(self.folder_name, self.url, self.headers).status_code == 409
+
+    def test_create_folder_code_401(self):
+        headers = self.headers.copy()
+        headers["Authorization"] = "123"
+        assert create_folder(self.folder_name, self.url, headers).status_code == 401
+
+    def test_create_folder_code_400(self):
+        assert create_folder(self.folder_name, url=self.url, headers=self.headers, params={"path12": "123"}).status_code == 400
+
+
+if __name__ == '__main__':
+    print(path)
+    #  TestYandexDisk().setup_method()
