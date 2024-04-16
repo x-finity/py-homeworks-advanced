@@ -5,3 +5,4 @@
 data.json
 05_decorators/*.log
 06_tests/config.json
+06_tests/driver

@@ -8,7 +8,7 @@ sys.path.append(str(path))
 
 from main import solution, vote, turtle_hare
 from yandex import create_folder, create_headers, delete_folder, get_folder_info
-
+from selenium_auth import ya_auth, read_config
 
 @pytest.mark.parametrize(
     "a, b, c, expected",
@@ -72,7 +72,8 @@ class TestYandexDisk:
 
     def test_create_folder_code_201(self):
         response = create_folder(self.folder_name, self.url, self.headers)
-        assert response.status_code == 201
+        assert (response.status_code == 201 and
+                get_folder_info(self.folder_name, self.url, self.headers).status_code == 200)
 
     def test_create_folder_code_409(self):
         if get_folder_info(self.folder_name, self.url, self.headers).status_code != 200:
@@ -85,9 +86,14 @@ class TestYandexDisk:
         assert create_folder(self.folder_name, self.url, headers).status_code == 401
 
     def test_create_folder_code_400(self):
-        assert create_folder(self.folder_name, url=self.url, headers=self.headers, params={"path12": "123"}).status_code == 400
+        assert create_folder(self.folder_name, url=self.url, headers=self.headers,
+                             params={"path12": "123"}).status_code == 400
+
+
+def test_yandex_auth():
+    config = read_config(f"{path}/config.json")
+    assert ya_auth(config['login'], config['password'], config['browser_path']) == 'https://id.yandex.ru/'
 
 
 if __name__ == '__main__':
     print(path)
-    #  TestYandexDisk().setup_method()
