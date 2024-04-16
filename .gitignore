@@ -1,5 +1,7 @@
-01_Import_module_package/application/__pycache__
-.idea
-.venv
+*/__pycache__
+*/*/__pycache__
+\.*
+*/\.*
 data.json
 05_decorators/*.log
+06_tests/config.json
